@@ -21,6 +21,18 @@ const infos: InfosProps[] = [
         id: 3,
         name: "Junin",
     },
+    {
+        id: 1,
+        name: "Mateus",
+    },
+    {
+        id: 2,
+        name: "Mateus",
+    },
+    {
+        id: 3,
+        name: "Junin",
+    },
 ];
 
 const PageHome = () => {
