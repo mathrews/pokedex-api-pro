@@ -1,41 +1,29 @@
 import styled from "styled-components";
-// import Grid from '@mui/material/Grid'; // Grid version 1
-import Grid2 from "@mui/material/Unstable_Grid2"; // Grid version 2
+import Grid2 from "@mui/material/Unstable_Grid2";
 import { Switch, TextField } from "@mui/material";
-
-type InfosProps = {
-    id?: number;
-    name?: string;
-};
-
-const infos: InfosProps[] = [
-    {
-        id: 1,
-        name: "Mateus",
-    },
-    {
-        id: 2,
-        name: "Mateus",
-    },
-    {
-        id: 3,
-        name: "Junin",
-    },
-    {
-        id: 1,
-        name: "Mateus",
-    },
-    {
-        id: 2,
-        name: "Mateus",
-    },
-    {
-        id: 3,
-        name: "Junin",
-    },
-];
+import axios from "axios";
+import { useEffect, useState } from "react";
 
 const PageHome = () => {
+    // const [isLoading, setIsLoading] = useState(false);
+    const [listaDePokemons, setListaDePokemons] = useState([]);
+
+    const fetchListData = () => {
+        axios.get("https://pokeapi.co/api/v2/pokemon/").then((response) => {
+            const sortedArray = [...response.data.results];
+
+            sortedArray.sort((a, b) => {
+                return a.name.localeCompare(b.name); // ordena em ordem alfabetica
+            });
+
+            setListaDePokemons(sortedArray);
+        });
+    };
+
+    useEffect(() => {
+        fetchListData()
+    }, []);
+
     return (
         <>
             <HeaderStyled>
@@ -79,21 +67,51 @@ const PageHome = () => {
             <MainStyled>
                 <Grid2
                     container
-                    sx={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between"}}>
-                    {infos.map((item) => (
-                        <Grid2
-                            md={4}
-                            sx={{ display: "flex", justifyContent: "center" }}
-                            >
-                            <div>
-                                <h2>#{item.id}</h2>
-                                <h1>{item.name}</h1>
-                            </div>
-                        </Grid2>
+                    sx={{
+                        display: "flex",
+                        flexWrap: "wrap",
+                        justifyContent: "space-between",
+                    }}>
+                    {listaDePokemons.map((item) => (
+                        <Pokemon
+                            key={item.name}
+                            data={item}
+                        />
                     ))}
                 </Grid2>
             </MainStyled>
         </>
+    );
+};
+
+type Pokemon = {
+    data: {
+        url: string;
+    };
+};
+
+const Pokemon = ({ data }: Pokemon) => {
+    const [details, setDetails] = useState(null);
+
+    useEffect(() => {
+        axios.get(data.url).then((response) => {
+            setDetails(response.data);
+        });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    if (details === null) {
+        return (
+            <Grid2>
+                <h2>Carregando...</h2>
+            </Grid2>
+        );
+    }
+
+    return (
+        <Grid2 md={4}>
+            <b>{details.name}</b> EXP - {details.base_experience}
+        </Grid2>
     );
 };
 
