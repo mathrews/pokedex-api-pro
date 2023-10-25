@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import Grid2 from "@mui/material/Unstable_Grid2";
-import { Switch, TextField } from "@mui/material";
+import { Skeleton, Switch, TextField } from "@mui/material";
 import axios from "axios";
 import { useEffect, useState } from "react";
 
@@ -9,7 +9,7 @@ const PageHome = () => {
     const [listaDePokemons, setListaDePokemons] = useState([]);
 
     const fetchListData = () => {
-        axios.get("https://pokeapi.co/api/v2/pokemon/").then((response) => {
+        axios.get("https://pokeapi.co/api/v2/pokemon?limit=300&offset=0.").then((response) => {
             const sortedArray = [...response.data.results];
 
             sortedArray.sort((a, b) => {
@@ -21,11 +21,12 @@ const PageHome = () => {
     };
 
     useEffect(() => {
-        fetchListData()
+        fetchListData();
     }, []);
 
     return (
         <>
+        <Container>
             <HeaderStyled>
                 <Grid2
                     container
@@ -73,13 +74,18 @@ const PageHome = () => {
                         justifyContent: "space-between",
                     }}>
                     {listaDePokemons.map((item) => (
-                        <Pokemon
-                            key={item.name}
-                            data={item}
-                        />
+                        <Grid2
+                            md={4}
+                            sx={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+                            <Pokemon
+                                key={item.name}
+                                data={item}
+                            />
+                        </Grid2>
                     ))}
                 </Grid2>
             </MainStyled>
+        </Container>
         </>
     );
 };
@@ -95,25 +101,40 @@ const Pokemon = ({ data }: Pokemon) => {
 
     useEffect(() => {
         axios.get(data.url).then((response) => {
-            setDetails(response.data);
+            setTimeout(() => {
+                setDetails(response.data);
+            }, 3000);
         });
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     if (details === null) {
         return (
-            <Grid2>
-                <h2>Carregando...</h2>
+            <Grid2
+                md={4}
+                sx={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <Skeleton
+                    variant="rectangular"
+                    width={100}
+                    height={100}
+                />
             </Grid2>
         );
     }
 
     return (
         <Grid2 md={4}>
-            <b>{details.name}</b> EXP - {details.base_experience}
+            <PokemonCard>
+                <img src={details.sprites.other.dream_world.front_default} />
+                <h4>{details.name}</h4> EXP - {details.base_experience}
+            </PokemonCard>
         </Grid2>
     );
 };
+
+const Container = styled.div`
+    overflow: hidden;
+`;
 
 const HeaderStyled = styled.header`
     width: 100%;
@@ -125,6 +146,12 @@ const HeaderStyled = styled.header`
 const MainStyled = styled.main`
     width: 100%;
     padding: 3em;
+`;
+
+const PokemonCard = styled.div`
+    & img {
+        display: block;
+    }
 `;
 
 export default PageHome;
