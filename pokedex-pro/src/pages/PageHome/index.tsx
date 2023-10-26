@@ -4,13 +4,18 @@ import { Skeleton, Switch, TextField } from "@mui/material";
 import axios from "axios";
 import { useEffect, useState } from "react";
 
+type ResultsArray = {
+    name: string;
+    url: string;
+};
+
 const PageHome = () => {
     // const [isLoading, setIsLoading] = useState(false);
-    const [listaDePokemons, setListaDePokemons] = useState([]);
+    const [listaDePokemons, setListaDePokemons] = useState<ResultsArray[]>([]);
 
     const fetchListData = () => {
         axios.get("https://pokeapi.co/api/v2/pokemon?limit=300&offset=0.").then((response) => {
-            const sortedArray = [...response.data.results];
+            const sortedArray: ResultsArray[] = [...response.data.results];
 
             sortedArray.sort((a, b) => {
                 return a.name.localeCompare(b.name); // ordena em ordem alfabetica
@@ -26,78 +31,92 @@ const PageHome = () => {
 
     return (
         <>
-        <Container>
-            <HeaderStyled>
-                <Grid2
-                    container
-                    sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "space-between",
-                    }}>
+            <Container>
+                <HeaderStyled>
                     <Grid2
-                        xs
-                        sm
-                        md={2}>
-                        <h1>PokeDex</h1>
-                    </Grid2>
-                    <Grid2
-                        xs
-                        sm
-                        md={6}>
-                        <TextField
-                            fullWidth
-                            id="outlined-basic"
-                            label="Search"
-                            variant="outlined"
-                        />
-                    </Grid2>
-                    <Grid2
+                        container
                         sx={{
                             display: "flex",
                             alignItems: "center",
+                            justifyContent: "space-between",
                         }}>
-                        <h3>Dark Mode</h3>
-                        <Switch
-                            defaultChecked
-                            color="secondary"
-                        />
-                    </Grid2>
-                </Grid2>
-            </HeaderStyled>
-            <MainStyled>
-                <Grid2
-                    container
-                    sx={{
-                        display: "flex",
-                        flexWrap: "wrap",
-                        justifyContent: "space-between",
-                    }}>
-                    {listaDePokemons.map((item) => (
                         <Grid2
-                            md={4}
-                            sx={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
-                            <Pokemon
-                                key={item.name}
-                                data={item}
+                            xs
+                            sm
+                            md={2}>
+                            <h1>PokeDex</h1>
+                        </Grid2>
+                        <Grid2
+                            xs
+                            sm
+                            md={6}>
+                            <TextField
+                                fullWidth
+                                id="outlined-basic"
+                                label="Search"
+                                variant="outlined"
                             />
                         </Grid2>
-                    ))}
-                </Grid2>
-            </MainStyled>
-        </Container>
+                        <Grid2
+                            sx={{
+                                display: "flex",
+                                alignItems: "center",
+                            }}>
+                            <h3>Dark Mode</h3>
+                            <Switch
+                                defaultChecked
+                                color="secondary"
+                            />
+                        </Grid2>
+                    </Grid2>
+                </HeaderStyled>
+                <MainStyled>
+                    <Grid2
+                        container
+                        sx={{
+                            display: "flex",
+                            flexWrap: "wrap",
+                            justifyContent: "space-between",
+                        }}>
+                        {listaDePokemons.map((item) => (
+                            <Grid2
+                                md={4}
+                                sx={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+                                <Pokemon
+                                    key={item.name}
+                                    data={item}
+                                />
+                            </Grid2>
+                        ))}
+                    </Grid2>
+                </MainStyled>
+            </Container>
         </>
     );
 };
 
-type Pokemon = {
+type PokemonPropData = {
     data: {
+        name: string;
         url: string;
     };
 };
 
-const Pokemon = ({ data }: Pokemon) => {
-    const [details, setDetails] = useState(null);
+type Pokemon = {
+    id: number;
+    base_experience: number;
+    name: string;
+    sprites: {
+        other: {
+            dream_world : {
+                front_default: string;
+            }
+        }
+    }
+}
+
+const Pokemon = ({ data }: PokemonPropData) => {
+    const [details, setDetails] = useState<Pokemon | null>(null);
 
     useEffect(() => {
         axios.get(data.url).then((response) => {
@@ -126,6 +145,7 @@ const Pokemon = ({ data }: Pokemon) => {
         <Grid2 md={4}>
             <PokemonCard>
                 <img src={details.sprites.other.dream_world.front_default} />
+                <div>#{details.id}</div>
                 <h4>{details.name}</h4> EXP - {details.base_experience}
             </PokemonCard>
         </Grid2>
