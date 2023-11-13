@@ -169,8 +169,20 @@ const MainStyled = styled.main`
 `;
 
 const PokemonCard = styled.div`
+    display: block;
+    padding-top: 3em;
+    padding-bottom: 3em;
+    padding-right: 3em;
+    padding-left: 3em;
+    border-radius: 1em;
+    background-image: linear-gradient(120deg, #FFFFFF20, #00000030);
+    border: 2px solid #00000050;
+    margin-bottom: 1em;
+
     & img {
         display: block;
+        width: 10em;
+        height: 10em;
     }
 `;
 
